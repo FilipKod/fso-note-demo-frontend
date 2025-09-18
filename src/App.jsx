@@ -8,27 +8,25 @@ const App = () => {
   const [showAll, setShowAll] = useState(true);
 
   const hook = () => {
-    console.log("effect");
     axios.get("http://localhost:3001/notes").then((response) => {
-      console.log("promise fullfiled");
       setAppNotes(response.data);
     });
   };
 
   useEffect(hook, []);
 
-  console.log("render", appNotes.length, "notes");
-
   const addNote = (event) => {
     event.preventDefault();
     const noteObj = {
       content: newNote,
       important: Math.random() < 0.5,
-      id: String(appNotes.length + 1),
+      // id: String(appNotes.length + 1),
     };
 
-    setAppNotes(appNotes.concat(noteObj));
-    setNewNote("");
+    axios.post("http://localhost:3001/notes", noteObj).then((response) => {
+      setAppNotes(appNotes.concat(response.data));
+      setNewNote("");
+    });
   };
 
   const handleNoteChange = (event) => {
@@ -38,6 +36,19 @@ const App = () => {
   const notesToShow = showAll
     ? appNotes
     : appNotes.filter((note) => note.important);
+
+  const toggleImportanceOf = (id) => {
+    const url = `http://localhost:3001/notes/${id}`;
+    const note = appNotes.find((note) => note.id === id);
+    const changedNote = { ...note, important: !note.important };
+
+    axios.put(url, changedNote).then((response) => {
+      console.log(response.data);
+      setAppNotes(
+        appNotes.map((note) => (note.id === id ? response.data : note))
+      );
+    });
+  };
 
   return (
     <div>
@@ -49,7 +60,11 @@ const App = () => {
       </div>
       <ul>
         {notesToShow.map((note) => (
-          <Note key={note.id} note={note} />
+          <Note
+            key={note.id}
+            note={note}
+            toggleImportance={() => toggleImportanceOf(note.id)}
+          />
         ))}
       </ul>
       <form onSubmit={addNote}>
