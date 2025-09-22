@@ -38,11 +38,17 @@ const App = () => {
     const note = appNotes.find((note) => note.id === id);
     const changedNote = { ...note, important: !note.important };
 
-    noteService.update(id, changedNote).then((updatedNote) => {
-      setAppNotes(
-        appNotes.map((note) => (note.id === id ? updatedNote : note))
-      );
-    });
+    noteService
+      .update(id, changedNote)
+      .then((updatedNote) => {
+        setAppNotes(
+          appNotes.map((note) => (note.id === id ? updatedNote : note))
+        );
+      })
+      .catch(() => {
+        alert(`the note '${note.content}' was alredy deleted from server`);
+        setAppNotes(appNotes.filter((n) => n.id !== id));
+      });
   };
 
   return (
