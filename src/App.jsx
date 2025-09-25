@@ -5,7 +5,7 @@ import Notification from "./components/Notification";
 import Footer from "./components/Footer";
 
 const App = () => {
-  const [appNotes, setAppNotes] = useState([]);
+  const [appNotes, setAppNotes] = useState(null);
   const [newNote, setNewNote] = useState("");
   const [showAll, setShowAll] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -67,13 +67,14 @@ const App = () => {
         </button>
       </div>
       <ul>
-        {notesToShow.map((note) => (
-          <Note
-            key={note.id}
-            note={note}
-            toggleImportance={() => toggleImportanceOf(note.id)}
-          />
-        ))}
+        {notesToShow &&
+          notesToShow.map((note) => (
+            <Note
+              key={note.id}
+              note={note}
+              toggleImportance={() => toggleImportanceOf(note.id)}
+            />
+          ))}
       </ul>
       <form onSubmit={addNote}>
         <input value={newNote} onChange={handleNoteChange} />
